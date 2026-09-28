@@ -39,8 +39,4 @@ project-1/
 └── README.md
 ```
 
-## Screenshots
-_Add mobile (375px), tablet (768px) and desktop (1440px) screenshots here._
 
-## Lighthouse
-_Add your Performance / Accessibility / Best Practices / SEO scores here._
