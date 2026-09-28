@@ -3,7 +3,7 @@
 **DecodeLabs Full Stack Development Internship – Project 1 (Batch 2026)**
 A mobile-first, accessible task manager built with **pure HTML, CSS and JavaScript** (no frameworks).
 
-🔗 **Live demo:** _add your GitHub Pages / Netlify link here_
+🔗 **Live demo:** https://areesha-imran609.github.io/Decodelabs-project-1/
 
 ## Features
 - Add, edit, complete and delete tasks
