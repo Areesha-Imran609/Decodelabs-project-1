@@ -1,0 +1,371 @@
+/* =========================================================
+   Tasklight – Project 1 (DecodeLabs)
+   Mobile-first. Breakpoints: 768px (tablet), 1024px (desktop)
+   Palette: Mocha Mousse / Ethereal Blue / Moonlit Grey
+   Fonts: Montserrat 700 (headings), Roboto 400 + 500 (body)
+   ========================================================= */
+
+/* ---------- 1. Design tokens ---------- */
+:root {
+  /* Brand palette from the brief */
+  --mocha: #A5856F;        /* Mocha Mousse – stability */
+  --blue: #A0D4E0;         /* Ethereal Blue – trust   */
+  --grey: #F2F0EA;         /* Moonlit Grey – refinement */
+
+  /* Light theme (default) */
+  --bg: var(--grey);
+  --surface: #FFFFFF;
+  --surface-2: #E9E5DC;
+  --text: #3B2A20;         /* 12:1 on --bg */
+  --muted: #64534A;        /* 6.4:1 on --bg */
+  --border: #D8D2C6;
+  --accent: #7A5B47;       /* deep mocha, 6.3:1 with white text */
+  --accent-hover: #64483A;
+  --on-accent: #FFFFFF;
+  --danger: #A33A2B;
+  --focus: #1F5F73;
+
+  --badge-high-bg: #F3D9D3;   --badge-high-fg: #7A2418;
+  --badge-med-bg:  #A0D4E0;   --badge-med-fg:  #0F3B49;
+  --badge-low-bg:  #E4E0D4;   --badge-low-fg:  #4A3C32;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 2px rgba(59, 42, 32, .08), 0 6px 18px rgba(59, 42, 32, .06);
+
+  --font-head: 'Montserrat', 'Inter', system-ui, sans-serif;
+  --font-body: 'Roboto', 'Open Sans', system-ui, sans-serif;
+
+  --space: clamp(1rem, 3vw, 1.5rem);
+}
+
+/* Dark theme: follows the OS unless the user picked a theme */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #241C17; --surface: #2F2620; --surface-2: #3A2F28;
+    --text: #F2F0EA; --muted: #CFC5B8; --border: #4A3D34;
+    --accent: #C9A78F; --accent-hover: #D9BBA6; --on-accent: #241C17;
+    --danger: #F2A597; --focus: #A0D4E0;
+    --badge-high-bg: #5A2A22; --badge-high-fg: #F6C9C0;
+    --badge-med-bg: #1F4D5C;  --badge-med-fg: #CFEAF1;
+    --badge-low-bg: #43372F;  --badge-low-fg: #E2D9CC;
+    --shadow: 0 1px 2px rgba(0,0,0,.4);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #241C17; --surface: #2F2620; --surface-2: #3A2F28;
+  --text: #F2F0EA; --muted: #CFC5B8; --border: #4A3D34;
+  --accent: #C9A78F; --accent-hover: #D9BBA6; --on-accent: #241C17;
+  --danger: #F2A597; --focus: #A0D4E0;
+  --badge-high-bg: #5A2A22; --badge-high-fg: #F6C9C0;
+  --badge-med-bg: #1F4D5C;  --badge-med-fg: #CFEAF1;
+  --badge-low-bg: #43372F;  --badge-low-fg: #E2D9CC;
+  --shadow: 0 1px 2px rgba(0,0,0,.4);
+}
+
+/* ---------- 2. Base / reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+h1, h2 {
+  font-family: var(--font-head);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0;
+}
+
+h1 { font-size: clamp(1.75rem, 5vw, 2.75rem); }
+h2 { font-size: clamp(1.05rem, 2.4vw, 1.3rem); }
+
+p { margin: 0; }
+ul { margin: 0; padding: 0; list-style: none; }
+
+button, input, select { font: inherit; color: inherit; }
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.muted { color: var(--muted); }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.skip-link {
+  position: absolute; left: 1rem; top: -4rem;
+  background: var(--accent); color: var(--on-accent);
+  padding: .6rem 1rem; border-radius: var(--radius-sm); z-index: 100;
+}
+.skip-link:focus { top: 1rem; }
+
+/* ---------- 3. Page layout (CSS Grid – macro) ---------- */
+/* Mobile: single column */
+.app {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr auto;
+  grid-template-areas:
+    "header"
+    "sidebar"
+    "main"
+    "footer";
+}
+
+.site-header  { grid-area: header; }
+.sidebar      { grid-area: sidebar; }
+.main         { grid-area: main; }
+.site-footer  { grid-area: footer; }
+
+/* ---------- 4. Header (Flexbox – micro) ---------- */
+.site-header {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: .75rem;
+  padding: .75rem var(--space);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand { display: flex; align-items: center; gap: .6rem; color: var(--accent); }
+.brand-name {
+  font-family: var(--font-head); font-weight: 700;
+  font-size: 1.2rem; color: var(--text);
+}
+
+.header-actions { display: flex; align-items: center; gap: .5rem; }
+
+/* Hamburger icon (pure CSS) */
+.menu-icon, .menu-icon::before, .menu-icon::after {
+  display: block; width: 18px; height: 2px; background: currentColor;
+  border-radius: 2px; transition: transform .2s ease;
+}
+.menu-icon { position: relative; }
+.menu-icon::before, .menu-icon::after { content: ""; position: absolute; left: 0; }
+.menu-icon::before { top: -6px; }
+.menu-icon::after  { top: 6px; }
+.menu-toggle[aria-expanded="true"] .menu-icon { background: transparent; }
+.menu-toggle[aria-expanded="true"] .menu-icon::before { top: 0; transform: rotate(45deg); }
+.menu-toggle[aria-expanded="true"] .menu-icon::after  { top: 0; transform: rotate(-45deg); }
+
+/* ---------- 5. Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 44px;              /* comfortable touch target */
+  padding: .55rem 1.1rem;
+  border: 1.5px solid transparent; border-radius: var(--radius-sm);
+  font-weight: 500; cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+.btn-primary { background: var(--accent); color: var(--on-accent); }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-outline { background: transparent; border-color: var(--accent); color: var(--text); }
+.btn-outline:hover { background: var(--surface-2); }
+.btn-ghost { background: transparent; border-color: var(--border); color: var(--text); }
+.btn-ghost:hover { background: var(--surface-2); }
+.btn-small { min-height: 40px; padding: .35rem .8rem; font-size: .9rem; }
+.btn-danger { background: transparent; border-color: var(--danger); color: var(--danger); }
+.btn-danger:hover { background: var(--surface-2); }
+
+/* ---------- 6. Sidebar ---------- */
+/* Mobile + tablet: collapsed until the Filters button is pressed */
+.sidebar {
+  display: none;
+  padding: var(--space);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+.sidebar.is-open { display: block; }
+
+.side-title { font-size: .95rem; margin-bottom: .6rem; }
+
+.filter-list { display: flex; flex-direction: column; gap: .35rem; margin-bottom: 1.5rem; }
+
+.filter-btn {
+  width: 100%; min-height: 44px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .5rem .9rem;
+  background: transparent; border: 1.5px solid transparent; border-radius: var(--radius-sm);
+  cursor: pointer; text-align: left;
+}
+.filter-btn:hover { background: var(--surface); }
+.filter-btn[aria-pressed="true"] {
+  background: var(--surface); border-color: var(--accent); font-weight: 500;
+}
+.count {
+  min-width: 1.8rem; text-align: center; padding: 0 .5rem;
+  background: var(--blue); color: #0F3B49; border-radius: 999px;
+  font-size: .85rem; font-weight: 500;
+}
+
+.progress-card { display: flex; flex-direction: column; gap: .6rem; }
+
+progress {
+  width: 100%; height: 12px; border: 0; border-radius: 999px; overflow: hidden;
+  background: var(--border); appearance: none; -webkit-appearance: none;
+}
+progress::-webkit-progress-bar   { background: var(--border); }
+progress::-webkit-progress-value { background: var(--accent); transition: width .3s ease; }
+progress::-moz-progress-bar      { background: var(--accent); }
+
+/* ---------- 7. Main content ---------- */
+.main {
+  padding: var(--space);
+  display: flex; flex-direction: column; gap: var(--space);
+  min-width: 0;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space);
+  box-shadow: var(--shadow);
+}
+.panel-title { margin-bottom: 1rem; }
+
+/* ---------- 8. Form ---------- */
+#task-form { display: grid; gap: 1rem; }
+
+.field { display: flex; flex-direction: column; gap: .35rem; min-width: 0; }
+.field label { font-weight: 500; font-size: .95rem; }
+
+input[type="text"], input[type="search"], input[type="date"], select {
+  width: 100%; min-height: 46px; padding: .55rem .8rem;
+  background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+}
+input::placeholder { color: var(--muted); opacity: .8; }
+input:hover, select:hover { border-color: var(--mocha); }
+input[aria-invalid="true"] { border-color: var(--danger); }
+
+.error { min-height: 0; color: var(--danger); font-size: .9rem; font-weight: 500; }
+.error:empty { display: none; }
+
+.form-actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+
+/* ---------- 9. Task list ---------- */
+.list-head { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem; }
+.list-head .panel-title { margin-bottom: 0; }
+.list-tools { display: grid; gap: .75rem; }
+
+.task-list { display: grid; gap: .75rem; grid-template-columns: minmax(0, 1fr); }
+
+.task {
+  display: flex; flex-direction: column; gap: .7rem;
+  padding: .9rem 1rem;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-left: 6px solid var(--mocha);
+  border-radius: var(--radius-sm);
+}
+.task[data-priority="high"]   { border-left-color: var(--danger); }
+.task[data-priority="medium"] { border-left-color: var(--blue); }
+.task[data-priority="low"]    { border-left-color: var(--mocha); }
+
+.task-main { display: flex; align-items: flex-start; gap: .75rem; }
+.task-main input[type="checkbox"] {
+  flex: none; width: 22px; height: 22px; margin-top: .15rem;
+  accent-color: var(--accent); cursor: pointer;
+}
+.task-title { flex: 1; min-width: 0; overflow-wrap: anywhere; cursor: pointer; }
+
+.task.is-done .task-title { text-decoration: line-through; color: var(--muted); }
+.task.is-done { opacity: .85; }
+
+.task-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; font-size: .88rem; }
+
+.badge {
+  padding: .1rem .65rem; border-radius: 999px; font-weight: 500; font-size: .82rem;
+}
+.badge-high   { background: var(--badge-high-bg); color: var(--badge-high-fg); }
+.badge-medium { background: var(--badge-med-bg);  color: var(--badge-med-fg); }
+.badge-low    { background: var(--badge-low-bg);  color: var(--badge-low-fg); }
+.due.is-overdue { color: var(--danger); font-weight: 500; }
+
+.task-actions { display: flex; gap: .5rem; }
+
+.empty {
+  text-align: center; padding: 2rem 1rem;
+  border: 2px dashed var(--border); border-radius: var(--radius-sm);
+}
+.empty-title { font-weight: 500; font-size: 1.1rem; margin-bottom: .25rem; }
+
+/* ---------- 10. Footer ---------- */
+.site-footer {
+  padding: 1.25rem var(--space);
+  text-align: center; font-size: .9rem; color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+
+/* Container query: task card adapts to its own width, not the viewport */
+.task-list > li { container-type: inline-size; }
+@container (min-width: 420px) {
+  .task { flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+  .task-main { flex: 1 1 60%; }
+  .task-meta { flex: 1 1 100%; order: 3; }
+}
+
+/* =========================================================
+   TABLET  ≥ 768px
+   ========================================================= */
+@media (min-width: 768px) {
+  #task-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .field-title, .form-actions { grid-column: 1 / -1; }
+
+  .list-head { flex-direction: row; align-items: flex-end; justify-content: space-between; }
+  .list-tools { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+
+  .task-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* =========================================================
+   DESKTOP  ≥ 1024px  – sidebar + main via CSS Grid
+   ========================================================= */
+@media (min-width: 1024px) {
+  .app {
+    grid-template-columns: 280px minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "header  header"
+      "sidebar main"
+      "footer  footer";
+  }
+
+  .menu-toggle { display: none; }
+
+  .sidebar {
+    display: block;
+    border-bottom: 0;
+    border-right: 1px solid var(--border);
+  }
+
+  .main { max-width: 1100px; width: 100%; margin-inline: auto; }
+
+  #task-form { grid-template-columns: 2fr 1fr 1fr; align-items: start; }
+  .field-title { grid-column: 1 / 2; }
+  .form-actions { grid-column: 1 / -1; }
+}
+
+/* ---------- Motion preferences ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
